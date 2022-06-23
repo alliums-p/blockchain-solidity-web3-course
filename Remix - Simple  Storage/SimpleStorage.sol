@@ -15,7 +15,8 @@ contract SimpleStorage {
     People[] public people; //Array of People Struct
 
     // Stores favourite number
-    function store(uint256 _favouriteNumber) public {
+    // Using `virtual` to make the function overridable by child contract
+    function store(uint256 _favouriteNumber) public virtual {
         favouriteNumber = _favouriteNumber;
     }
 
