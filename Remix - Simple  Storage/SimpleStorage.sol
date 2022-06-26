@@ -2,7 +2,6 @@
 pragma solidity ^0.8.7;
 
 contract SimpleStorage {
-    
     uint256 favouriteNumber; // Default initialization with zero value
 
     mapping(string => uint256) public nameToFavouriteNumber;
@@ -30,5 +29,4 @@ contract SimpleStorage {
         people.push(People(_favouriteNumber, _name));
         nameToFavouriteNumber[_name] = _favouriteNumber;
     }
-
 }
