@@ -19,8 +19,6 @@ async function main() {
   const contractFactory = new ethers.ContractFactory(abi, binary, wallet);
   console.log("Deploying, please wait...");
 
-  console.log(contractFactory);
-
   const contract = await contractFactory.deploy(); // Deploys the contract
 }
 
