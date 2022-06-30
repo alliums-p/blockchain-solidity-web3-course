@@ -31,9 +31,10 @@ module.exports = {
             url: ALCHEMY_RPC_URL,
             accounts: [PRIVATE_KEY],
             chainId: 4,
+            timeout: 400000,
         },
     },
     etherscan: {
-        api: ETHERSCAN_API,
+        apiKey: ETHERSCAN_API,
     },
 }
