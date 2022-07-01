@@ -2,6 +2,8 @@ require("@nomiclabs/hardhat-waffle")
 require("dotenv").config()
 require("@nomiclabs/hardhat-etherscan")
 
+require("hardhat-gas-reporter")
+
 // This is a sample Hardhat task. To learn how to create your own go to
 require("./tasks/block-number")
 
@@ -12,22 +14,36 @@ require("./tasks/block-number")
  * @type import('hardhat/config').HardhatUserConfig
  */
 
-const ALCHEMY_RPC_URL = process.env.ALCHEMY_RPC_URL
-const PRIVATE_KEY = process.env.PRIVATE_KEY
-const ETHERSCAN_API = process.env.ETHERSCAN_API
+const RINKEBY_RPC_URL = process.env.ALCHEMY_RPC_URL || ""
+const PRIVATE_KEY = process.env.PRIVATE_KEY || ""
+const ETHERSCAN_API = process.env.ETHERSCAN_API || ""
+const COINMARKETCAP_API = process.env.COINMARKETCAP_API || ""
 
 module.exports = {
     solidity: "0.8.7",
     defaultNetwork: "hardhat",
     networks: {
-        alchemy: {
-            url: ALCHEMY_RPC_URL,
+        rinkeby: {
+            url: RINKEBY_RPC_URL,
             accounts: [PRIVATE_KEY],
             chainId: 4,
+            timeout: 400000,
+        },
+        localhost: {
+            url: "http://127.0.0.1:8545/",
+            chainId: 31337,
             timeout: 400000,
         },
     },
     etherscan: {
         apiKey: ETHERSCAN_API,
+    },
+    gasReporter: {
+        enabled: false,
+        outputFile: "gas-report.txt",
+        noColors: true,
+        currency: "USD",
+        coinmarketcap: COINMARKETCAP_API,
+        // token: "MATIC", // specify different token for different blockchain
     },
 }

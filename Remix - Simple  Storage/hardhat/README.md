@@ -1,15 +1,11 @@
-# Basic Sample Hardhat Project
+# Hardhat - Simple Storage
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
+This project contains code on how to:
 
-Try running some of the following tasks:
-
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-node scripts/sample-script.js
-npx hardhat help
-```
+-   Use Hardhat to `deploy contracts`,
+-   Use custom hardhat commands `(hardhat task)`,
+-   Use `different networks` for deployment,
+-   Use `etherscan api` to verify contract through code,
+-   Use `gas reporter` to get gas consumption for deployment and contract functions,
+-   Use `Chai` to test the contract,
+-   Use `solidity coverage` to confirm test on all contract methods has been done,
