@@ -10,5 +10,5 @@ This project contains code on how to:
 -   Use `hardhat console` to test in command line itself, (`yarn hardhat console --network rinkeby/localhost/anyOtherNetwork`)
 -   Use `etherscan api` to verify contract through code,
 -   Use `gas reporter` to get gas consumption for deployment and contract functions,
--   Use `Chai` to test the contract,
--   Use `solidity coverage` to confirm test on all contract methods has been done,
+-   Use `Chai` to test the contract, (`yarns hardhat test --network networkName`)
+-   Use `solidity coverage` to confirm test on all contract methods has been done, (`yarn hardhat coverage`)
