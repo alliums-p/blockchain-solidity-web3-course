@@ -5,7 +5,7 @@ async function main() {
     const fundMe = await ethers.getContract("FundMe", deployer)
     console.log("Funding...")
     const transactionResponse = await fundMe.withdraw()
-    await transactionResponse.wait(1)
+    await transactionResponse.wait()
     console.log("Withdrawn!")
 }
 

@@ -18,14 +18,14 @@ error FundMe__NotEnoughETH();
 contract FundMe {
     using PriceConverter for uint256;
 
-    mapping(address => uint256) private addressToAmountFunded;
-    address[] private funders;
-
     // Could we make this constant?  /* hint: no! We should make it immutable! */
     address private immutable i_owner;
     uint256 public constant MINIMUM_USD = 50 * 10**18;
 
-    AggregatorV3Interface private immutable priceFeed;
+    mapping(address => uint256) private addressToAmountFunded;
+    address[] private funders;
+
+    AggregatorV3Interface private priceFeed;
 
     modifier onlyOwner() {
         // require(msg.sender == owner);
@@ -38,33 +38,20 @@ contract FundMe {
         priceFeed = AggregatorV3Interface(priceFeedAddress);
     }
 
-    receive() external payable {
-        fund();
-    }
-
-    fallback() external payable {
-        fund();
-    }
-
     /**
         @notice This function funds the contract
         @dev    This implements price feeds as our library
      */
     function fund() public payable {
         console.log("ETH sent: ", msg.value);
-        require(
-            msg.value.getConversionRate(priceFeed) >= MINIMUM_USD,
-            "FundMe__NotEnoughETH"
-        );
 
-        // if(msg.value.getConversionRate(priceFeed) <= MINIMUM_USD) revert FundMe__NotEnoughETH();
+        uint256 conv_value = msg.value.getConversionRate(priceFeed);
+        console.log("Converted Value: ", conv_value);
+
+        if(msg.value.getConversionRate(priceFeed) < MINIMUM_USD) revert FundMe__NotEnoughETH();
 
         addressToAmountFunded[msg.sender] += msg.value;
         funders.push(msg.sender);
-    }
-
-    function getVersion() public view returns (uint256) {
-        return priceFeed.version();
     }
 
     function withdraw() public payable onlyOwner {
@@ -82,6 +69,10 @@ contract FundMe {
 
         (bool callSuccess, ) = i_owner.call{value: address(this).balance}("");
         require(callSuccess);
+    }
+
+    function getVersion() public view returns (uint256) {
+        return priceFeed.version();
     }
 
     function getOwner() public view returns (address) {
@@ -102,6 +93,14 @@ contract FundMe {
 
     function getPriceFeed() public view returns (AggregatorV3Interface) {
         return priceFeed;
+    }
+
+    receive() external payable {
+        fund();
+    }
+
+    fallback() external payable {
+        fund();
     }
 
     // Explainer from: https://solidity-by-example.org/fallback/
