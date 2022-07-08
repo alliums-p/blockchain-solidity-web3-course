@@ -4,11 +4,18 @@ pragma solidity ^0.8.7;
 
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/KeeperCompatibleInterface.sol";
 
 error Lottery__NotEnoughETH();
 error Lottery__TransferFailed();
+error Lottery__NotOpen()
 
-contract Lottery is VRFConsumerBaseV2 {
+contract Lottery is VRFConsumerBaseV2, KeeperCompatibleInterface {
+
+    enum LotteryState {
+        OPEN,
+        CALCULATING
+    }
 
     VRFCoordinatorV2Interface private immutable i_vrfCoordinator;
 
@@ -24,6 +31,7 @@ contract Lottery is VRFConsumerBaseV2 {
     address payable[] private s_players;
 
     address private s_recentWinner;
+    LotteryState private s_lotteryState;
 
     // Events
     event LotteryParticipation(address indexed player);
@@ -43,10 +51,14 @@ contract Lottery is VRFConsumerBaseV2 {
 
         i_subscriptionId = subscriptionId;
         i_callbackGasLimit = callbackGasLimit;
+
+        s_lotteryState = LotteryState.OPEN;
     }
 
     function enterLottery() public payable {
         if(msg.value < s_lotteryFee) revert Lottery__NotEnoughETH();
+        if(s_lotteryState != LotteryState.OPEN) revert Lottery__NotOpen();
+
         s_players.push(
             payable(msg.sender)
         );
@@ -54,7 +66,25 @@ contract Lottery is VRFConsumerBaseV2 {
         emit LotteryParticipation(msg.sender);
     }
 
+    /**
+        @dev This function that the Chainlink Keeper nodes call
+        they look for the upkeepNeeded to return true
+
+        The following should be tru in order to return true:
+        1. Our time interval should have passed
+        2. The lottery should have atleast 1 player, and have some ETH
+        3. Subscription is funded with LINK
+        4. The lottery should be in an "open" state.
+    */
+    function checkUpkeep(
+        bytes calldata /*checkData*/
+    ) external override {
+        bool isOpen = (LotteryState.OPEN == s_lotteryState);
+    }
+
     function requestRandomWinner() external {
+        s_lotteryState = LotteryState.CALCULATING;
+
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
             i_subscriptionId,
@@ -73,6 +103,9 @@ contract Lottery is VRFConsumerBaseV2 {
         uint256 indexOfWinner = randomWords[0] % s_players.length;
         address payable recentWinner = s_players[indexOfWinner];
         s_recentWinner = recentWinner;
+        s_lotteryState = LotteryState.OPEN;
+
+        s_players = new address payable[](0);
 
         (bool success, ) = recentWinner.call{value: address(this).balance}("");
         if(!success) revert Lottery__TransferFailed();
