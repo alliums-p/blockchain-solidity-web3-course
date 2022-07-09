@@ -22,6 +22,7 @@ contract Lottery is VRFConsumerBaseV2, KeeperCompatibleInterface {
     bytes32 private immutable i_gasLane;
     uint64 private immutable i_subscriptionId;
     uint32 private immutable i_callbackGasLimit;
+    uint256 private immutable i_interval;
 
     uint32 private constant NUM_WORDS = 1;
     uint16 private constant REQUEST_CONFIRMATIONS = 3;
@@ -32,6 +33,7 @@ contract Lottery is VRFConsumerBaseV2, KeeperCompatibleInterface {
 
     address private s_recentWinner;
     LotteryState private s_lotteryState;
+    uint256 private s_lastTimestamp;
 
     // Events
     event LotteryParticipation(address indexed player);
@@ -43,7 +45,8 @@ contract Lottery is VRFConsumerBaseV2, KeeperCompatibleInterface {
         uint256 lotteryFee, 
         bytes32 gasLane,
         uint64 subscriptionId,
-        uint32 callbackGasLimit
+        uint32 callbackGasLimit,
+        uint256 interval
     ) VRFConsumerBaseV2(vrfCoordinatorV2) {
         s_lotteryFee = lotteryFee;
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
@@ -53,6 +56,9 @@ contract Lottery is VRFConsumerBaseV2, KeeperCompatibleInterface {
         i_callbackGasLimit = callbackGasLimit;
 
         s_lotteryState = LotteryState.OPEN;
+
+        s_lastTimestamp = block.timestamp;
+        i_interval = interval;
     }
 
     function enterLottery() public payable {
@@ -78,8 +84,17 @@ contract Lottery is VRFConsumerBaseV2, KeeperCompatibleInterface {
     */
     function checkUpkeep(
         bytes calldata /*checkData*/
-    ) external override {
+    ) 
+    external override returns (
+        bool upkeepNeeded, 
+        bytes memory /** performData */
+    ) {
         bool isOpen = (LotteryState.OPEN == s_lotteryState);
+
+        bool timePassed = ((block.timestamp - s_lastTimestamp) > i_interval);
+        bool hasPlayers = (s_pplayers.length > 0);
+        bool hasBalance = address(this).balance > 0;
+        upkeepNeeded = (isOpen && timePassed && hasPlayers && hasBalance);
     }
 
     function requestRandomWinner() external {
