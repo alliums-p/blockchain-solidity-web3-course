@@ -11,13 +11,22 @@ error Lottery__TransferFailed();
 error Lottery__NotOpen()
 error Lottery__UpkeepNotNeeded(uint256 currentBalance, uint256 numPlayers, uint256 lotteryState);
 
-contract Lottery is VRFConsumerBaseV2, KeeperCompatibleInterface {
 
+/**
+    @title      A sample Lottery Contract
+    @author     Alliums
+    @notice     This contract is for creating an untamperable decentralized smart contract for lottery.
+    @dev        This implements Chainlink VRF v2 and Chainlink Keepers
+*/
+contract Lottery is VRFConsumerBaseV2, KeeperCompatibleInterface {
+    
+    // Type declarations
     enum LotteryState {
         OPEN,
         CALCULATING
     }
 
+    // State Variables
     VRFCoordinatorV2Interface private immutable i_vrfCoordinator;
 
     bytes32 private immutable i_gasLane;
@@ -28,7 +37,7 @@ contract Lottery is VRFConsumerBaseV2, KeeperCompatibleInterface {
     uint32 private constant NUM_WORDS = 1;
     uint16 private constant REQUEST_CONFIRMATIONS = 3;
 
-
+    // Lottery Variables
     uint256 private s_lotteryFee;
     address payable[] private s_players;
 
@@ -41,6 +50,7 @@ contract Lottery is VRFConsumerBaseV2, KeeperCompatibleInterface {
     event RequestedLotteryWinner(uint256 indexed requestId);
     event WinnerPicked(address indexed winner);
 
+    // Functions
     constructor(
         address vrfCoordinatorV2, 
         uint256 lotteryFee, 
@@ -133,6 +143,7 @@ contract Lottery is VRFConsumerBaseV2, KeeperCompatibleInterface {
         s_lotteryState = LotteryState.OPEN;
 
         s_players = new address payable[](0);
+        s_lastTimestamp = block.timestamp;
 
         (bool success, ) = recentWinner.call{value: address(this).balance}("");
         if(!success) revert Lottery__TransferFailed();
@@ -151,4 +162,16 @@ contract Lottery is VRFConsumerBaseV2, KeeperCompatibleInterface {
     function getRecentWinner() public view returns (address) {
         return s_recentWinner;
     }
+
+    function getLotteryState() public  view returns (LotteryState) {
+        returns s_lotteryState;
+    }
+
+    function  getNumWords() public view returns (uint256) {
+        returns NUM_WORDS;
+    }
+
+    function receive() external payable {}
+    function fallback(bytes memory data) external payable {}
+
 }
