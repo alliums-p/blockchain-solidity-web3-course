@@ -8,7 +8,7 @@ import "@chainlink/contracts/src/v0.8/interfaces/KeeperCompatibleInterface.sol";
 
 error Lottery__NotEnoughETH();
 error Lottery__TransferFailed();
-error Lottery__NotOpen()
+error Lottery__NotOpen();
 error Lottery__UpkeepNotNeeded(uint256 currentBalance, uint256 numPlayers, uint256 lotteryState);
 
 
@@ -94,7 +94,7 @@ contract Lottery is VRFConsumerBaseV2, KeeperCompatibleInterface {
         4. The lottery should be in an "open" state.
     */
     function checkUpkeep(
-        bytes calldata /*checkData*/
+        bytes memory /*checkData*/
     ) 
     public override returns (
         bool upkeepNeeded, 
@@ -110,13 +110,13 @@ contract Lottery is VRFConsumerBaseV2, KeeperCompatibleInterface {
 
     function performUpkeep(
         bytes calldata /** performData */
-    ) external {
+    ) external override {
         (bool upkeepNeeded, ) = checkUpkeep("");
         if(!upkeepNeeded) { 
             revert Lottery__UpkeepNotNeeded(
                 address(this).balance, 
                 s_players.length,
-                uint256(s_LotteryState)
+                uint256(s_lotteryState)
             );
         }
 
@@ -164,14 +164,13 @@ contract Lottery is VRFConsumerBaseV2, KeeperCompatibleInterface {
     }
 
     function getLotteryState() public  view returns (LotteryState) {
-        returns s_lotteryState;
+        return s_lotteryState;
     }
 
-    function  getNumWords() public view returns (uint256) {
-        returns NUM_WORDS;
+    function  getNumWords() public pure returns (uint256) {
+        return NUM_WORDS;
     }
 
-    function receive() external payable {}
-    function fallback(bytes memory data) external payable {}
+    receive() external payable {}
 
 }
