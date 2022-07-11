@@ -183,6 +183,10 @@ contract Lottery is VRFConsumerBaseV2, KeeperCompatibleInterface {
         return REQUEST_CONFIRMATIONS;
     }
 
+    function getInterval() public view returns (uint256) {
+        return i_interval;
+    }
+
     receive() external payable {}
 
 }
