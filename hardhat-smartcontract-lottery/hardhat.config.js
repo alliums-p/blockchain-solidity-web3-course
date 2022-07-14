@@ -30,6 +30,12 @@ module.exports = {
       accounts: [PRIVATE_KEY]
     }
   },
+  etherscan: {
+    // yarn hardhat verify --network <NETWORK> <CONTRACT_ADDRESS> <CONSTRUCTOR_PARAMETERS>
+    apiKey: {
+      rinkeby: ETHERSCAN_API
+    },
+  },
   gasReporter: {
     enabled: false,
     currency: "USD",
