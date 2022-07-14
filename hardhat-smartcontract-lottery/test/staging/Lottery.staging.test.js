@@ -21,9 +21,10 @@ developmentChains.includes(network.name)
                     // access lottery
                     const startingTimeStamp = await lottery.getLatestTimestamp()
                     const accounts = await ethers.getSigners()
-                    const winnerStartingBalance = await accounts[0].getBalance()
 
                     await new Promise(async (resolve, reject) => {
+                        const winnerStartingBalance = await accounts[0].getBalance()
+
                         lottery.once("WinnerPicked", async () => {
                             console.log("WinnerPicked event fired!")
                             try {
@@ -37,8 +38,15 @@ developmentChains.includes(network.name)
                                 assert.equal(lotteryState, 0)
                                 assert.equal(
                                     winnerEndingBalance.toString(),
-                                    winnerStartingBalance.add(lotteryEntranceFee).toString()
+                                    winnerStartingBalance.toString()
                                 )
+                                // Use below code if the contract deducts lottery fee.
+                                // The above code does not add fee as it is not deducted in the code
+                                
+                                // assert.equal(
+                                //     winnerEndingBalance.toString(),
+                                //     winnerStartingBalance.add(lotteryEntranceFee).toString()
+                                // )
                                 assert(endingTimestamp > startingTimeStamp);
 
                                 resolve()
