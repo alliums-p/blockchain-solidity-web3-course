@@ -1,3 +1,8 @@
 node_modules/
 .encryptedKey.json
 .env
+artifacts/
+cache/
+coverage/
+coverage.json
+deployments/
