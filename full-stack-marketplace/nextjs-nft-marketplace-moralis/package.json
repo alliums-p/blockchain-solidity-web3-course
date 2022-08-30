@@ -10,11 +10,11 @@
     "moralis:sync": "moralis-admin-cli connect-local-devchain --chain hardhat --moralisSubdomain cqq7oxdrxtor.usemoralis.com --frpcPath ./frp/frpc"
   },
   "dependencies": {
-    "moralis": "^2.0.3",
+    "moralis": "^1.5.11",
     "next": "12.2.5",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "react-moralis": "^1.4.1",
+    "react": "18.1.0",
+    "react-dom": "18.1.0",
+    "react-moralis": "^1.3.5",
     "web3uikit": "0.1.170"
   },
   "devDependencies": {
