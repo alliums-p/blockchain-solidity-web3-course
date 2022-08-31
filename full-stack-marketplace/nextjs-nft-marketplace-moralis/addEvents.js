@@ -3,6 +3,7 @@ require("dotenv").config();
 const contractAddresses = require("./constants/networkMapping.json");
 let chainId = process.env.chainId || "31137";
 let moralisChainId = chainId == "31337" ? "1337" : chainId;
+// If accessing nft marketplace by chainId shows error. Hardcode chainId as required
 const contractAddress = contractAddresses[chainId]["NFTMarketplace"][0];
 
 const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
