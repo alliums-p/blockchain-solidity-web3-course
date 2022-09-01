@@ -46,7 +46,8 @@ Moralis.Cloud.afterSave("ItemCanceled", async (request) => {
         logger.info(`Marketplace | CanceledItem: ${canceledItem}`);
         if (canceledItem) {
             logger.info(
-                `Deleting ${request.object.get(
+                `Deleting tokenId: 
+                ${request.object.get(
                     "tokenId"
                 )} at address ${request.object.get(
                     "address"
@@ -57,7 +58,40 @@ Moralis.Cloud.afterSave("ItemCanceled", async (request) => {
             logger.info(
                 `No item found with address ${request.object.get(
                     "address"
-                )} and tookenId: ${request.object.get("tokenId")}`
+                )} and tokenId: ${request.object.get("tokenId")}`
+            );
+        }
+    }
+});
+
+Moralis.Cloud.afterSave("ItemBought", async (request) => {
+    const confirmed = request.object.get("confirmed");
+    const logger = Moralis.Cloud.getLogger();
+    logger.info(`Marketplace | Object: ${request.object}`);
+
+    if (confirmed) {
+        const ActiveItem = Moralis.Object.extend("ActiveItem");
+        const query = new Moralis.Query(ActiveItem);
+        query.equalTo("marketplaceAddress", request.object.get("address"));
+        query.equalTo("nftAddress", request.object.get("nftAddress"));
+        query.equalTo("tokenId", request.object.get("tokenId"));
+
+        logger.info(`Marketplace | Query: ${query}`);
+        const boughtItem = await query.first();
+
+        if (boughtItem) {
+            logger.info(`Deleting: ${request.object.get("objectId")}`);
+            await boughtItem.destroy();
+            logger.info(
+                `Deleted item with tokenId ${request.object.get(
+                    "tokenId"
+                )} at address ${request.object.get("address")}`
+            );
+        } else {
+            logger.info(
+                `No item found with address ${request.object.get(
+                    "address"
+                )} with tokenId: ${request.object.get("tokenId")}`
             );
         }
     }
