@@ -1,5 +1,6 @@
 import styles from "../styles/Home.module.css";
 import { useMoralisQuery } from "react-moralis";
+import NFTBox from "../components/NFTBox";
 
 export default function Home() {
     const { data: listedNfts, isFetching: fetchingListedNfts } =
@@ -29,6 +30,14 @@ export default function Home() {
                             Price: {price}, NftAddress: {nftAddress}, TokenId:{" "}
                             {tokenId}, MarketplaceAddress: {marketplaceAddress},
                             Seller: {seller}
+                            <NFTBox
+                                price={price}
+                                tokenId={tokenId}
+                                nftAddress={nftAddress}
+                                marketplaceAddress={marketplaceAddress}
+                                seller={seller}
+                                key={`${nftAddress}${tokenId}`}
+                            />
                         </div>
                     );
                 })
