@@ -156,6 +156,7 @@ async function main() {
     ) {
         console.log("Success! Database updated with watching events!");
     } else {
+        console.log(listedResponse, canceledResponse, boughtResponse);
         console.log("Something went wrong...");
     }
 }
