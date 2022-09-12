@@ -26,11 +26,36 @@ export default function UpdateListingModal({
         },
     });
 
+    const handleUpdateListingSuccess = async (tx) => {
+        await tx.wait(1);
+
+        dispatch({
+            type: "success",
+            message: "Listing updated",
+            title: "Listing updated - please refresh (and move blocks)",
+            position: "topR",
+        });
+    };
+
     return (
         <Modal
             isVisible={isVisible}
             onCancel={onClose}
             onCloseButtonPressed={onClose}
+            onOk={() => {
+                updateListing({
+                    onError: (error) => {
+                        dispatch({
+                            type: "error",
+                            title:
+                                error.message ||
+                                "Listing Update - Error occurred during update",
+                            position: "topR",
+                        });
+                    },
+                    onSuccess: () => handleUpdateListingSuccess,
+                });
+            }}
         >
             <Input
                 label="Update listing price in L1 Currency (ETH)"
