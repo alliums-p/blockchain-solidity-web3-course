@@ -5,6 +5,22 @@ import nftAbi from "../constants/TestNft.json";
 import Image from "next/image";
 import { Card } from "web3uikit";
 import { ethers } from "ethers";
+import UpdateListingModal from "./UpdateListingModal";
+
+const truncateStr = (fullStr, strLen) => {
+    if (fullStr.length <= strLen) return fullStr;
+
+    const separator = "...";
+    const separatorLength = separator.length;
+    const charsToShow = strLen - separatorLength;
+    const frontChars = Math.ceil(charsToShow / 2);
+    const backChars = Math.floor(charsToShow / 2);
+    return (
+        fullStr.substring(0, frontChars) +
+        separator +
+        fullStr.substring(fullStr.length - backChars)
+    );
+};
 
 export default function NFTBox({
     price,
@@ -13,10 +29,14 @@ export default function NFTBox({
     marketplaceAddress,
     seller,
 }) {
-    const { isWeb3Enabled } = useMoralis();
+    const { isWeb3Enabled, account } = useMoralis();
     const [imageURI, setImageURI] = useState("");
     const [tokenName, setTokenName] = useState("");
     const [tokenDescription, setTokenDescription] = useState("");
+    const [showModal, setShowModal] = useState(false);
+    const hideModal = () => {
+        setShowModal(false);
+    };
 
     const { runContractFunction: getTokenURI } = useWeb3Contract({
         abi: nftAbi,
@@ -56,32 +76,58 @@ export default function NFTBox({
         }
     }, [isWeb3Enabled]);
 
+    const isOwnedByUser = seller === account || seller === undefined;
+    const formattedSellerAddress = isOwnedByUser
+        ? "you"
+        : truncateStr(seller || "", 14);
+
+    const handleCardClick = () => {
+        isOwnedByUser ? setShowModal(true) : console.log("Let's buy it!");
+    };
+
     return (
         <div>
             <div>
                 {imageURI ? (
-                    <Card title={tokenName} description={tokenDescription}>
-                        <div className="p-2">
-                            <div className="flex flex-col items-end gap-2">
-                                <div>#{tokenId}</div>
-                                <div className="italic text-sm">
-                                    Owned by {seller}
-                                </div>
+                    <div>
+                        <UpdateListingModal
+                            isVisible={showModal}
+                            tokenId={tokenId}
+                            nftAddress={nftAddress}
+                            marketplaceAddress={marketplaceAddress}
+                            onClose={hideModal}
+                        />
 
-                                <Image
-                                    loader={() => imageURI}
-                                    src={imageURI}
-                                    height="200"
-                                    width="200"
-                                />
+                        <Card
+                            title={tokenName}
+                            description={tokenDescription}
+                            onClick={handleCardClick}
+                        >
+                            <div className="p-2">
+                                <div className="flex flex-col items-end gap-2">
+                                    <div>#{tokenId}</div>
+                                    <div className="italic text-sm">
+                                        Owned by {formattedSellerAddress}
+                                    </div>
 
-                                <div className="font-bold">
-                                    {ethers.utils.formatUnits(price, "ether")}{" "}
-                                    ETH
+                                    <Image
+                                        loader={() => imageURI}
+                                        src={imageURI}
+                                        height="200"
+                                        width="200"
+                                    />
+
+                                    <div className="font-bold">
+                                        {ethers.utils.formatUnits(
+                                            price,
+                                            "ether"
+                                        )}{" "}
+                                        ETH
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </Card>
+                        </Card>
+                    </div>
                 ) : (
                     <div>Loading...</div>
                 )}
