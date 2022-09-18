@@ -1,7 +1,7 @@
 const { ethers, network } = require("hardhat")
 const { moveBlocks } = require("../utils/move-blocks")
 
-const TOKEN_ID = 2
+const TOKEN_ID = 0
 
 async function cancel() {
     const nftMarketplace = await ethers.getContract("NFTMarketplace")
