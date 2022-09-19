@@ -1,10 +1,21 @@
 import Head from "next/head";
 import Header from "../components/Header";
 import styles from "../styles/Home.module.css";
-import { Form } from "web3uikit";
+import { Form, useNotification } from "web3uikit";
 import nftAbi from "../constants/TestNft.json";
+import nftMarketplaceAbi from "../constants/NFTMarketplace.json";
+import { useMoralis, useWeb3Contract } from "react-moralis";
+import networkMapping from "../constants/networkMapping.json";
 
 export default function Home() {
+    const { chainId } = useMoralis();
+    const chainString = chainId ? parseInt(chainId).toString() : "31337";
+    const marketplaceAddress = networkMapping[chainString].NFTMarketplace[0];
+
+    const dispatch = useNotification();
+
+    const { runContractFunction } = useWeb3Contract();
+
     async function approveAndList() {
         console.log("Approving...");
         const nftAddress = data.data[0].inputResult;
@@ -22,6 +33,43 @@ export default function Home() {
                 tokenId: tokenId,
             },
         };
+
+        await runContractFunction({
+            params: pproveOptions,
+            onSuccess: () => handleApproveSuccess(nftAddress, tokenId, price),
+            onError: (err) => {
+                console.log(err);
+            },
+        });
+    }
+
+    async function handleApproveSuccess(nftAddress, tokenId, price) {
+        console.log("Time to list!");
+        const listOptions = {
+            abi: nftMarketplaceAbi,
+            contractAddress: marketplaceAddress,
+            functionName: "listItem",
+            params: {
+                nftAddress: nftAddress,
+                tokenId: tokenId,
+                price: price,
+            },
+        };
+
+        await runContractFunction({
+            params: listOptions,
+            onSuccess: () => handleListSuccess(),
+            onError: (err) => console.log(err),
+        });
+    }
+
+    async function handleListSuccess() {
+        dispatch({
+            type: "success",
+            message: "NFT listing!",
+            title: "NFT listed!",
+            position: "topR",
+        });
     }
     return (
         <div className={styles.container}>
