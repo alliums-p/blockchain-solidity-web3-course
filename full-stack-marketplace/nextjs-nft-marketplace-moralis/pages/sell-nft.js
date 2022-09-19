@@ -6,6 +6,7 @@ import nftAbi from "../constants/TestNft.json";
 import nftMarketplaceAbi from "../constants/NFTMarketplace.json";
 import { useMoralis, useWeb3Contract } from "react-moralis";
 import networkMapping from "../constants/networkMapping.json";
+import { ethers } from "ethers";
 
 export default function Home() {
     const { chainId } = useMoralis();
@@ -16,7 +17,7 @@ export default function Home() {
 
     const { runContractFunction } = useWeb3Contract();
 
-    async function approveAndList() {
+    async function approveAndList(data) {
         console.log("Approving...");
         const nftAddress = data.data[0].inputResult;
         const tokenId = data.data[1].inputResult;
@@ -26,7 +27,7 @@ export default function Home() {
 
         const approveOption = {
             abi: nftAbi,
-            conractAddress: nftAddress,
+            contractAddress: nftAddress,
             functionName: "approve",
             params: {
                 to: marketplaceAddress,
@@ -35,7 +36,7 @@ export default function Home() {
         };
 
         await runContractFunction({
-            params: pproveOptions,
+            params: approveOption,
             onSuccess: () => handleApproveSuccess(nftAddress, tokenId, price),
             onError: (err) => {
                 console.log(err);
