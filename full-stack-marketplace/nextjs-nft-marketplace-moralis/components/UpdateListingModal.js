@@ -29,6 +29,8 @@ export default function UpdateListingModal({
     const handleUpdateListingSuccess = async (tx) => {
         // await tx.wait(1);
 
+        console.log("Cl before notification!");
+
         dispatch({
             type: "success",
             message: "Listing updated",

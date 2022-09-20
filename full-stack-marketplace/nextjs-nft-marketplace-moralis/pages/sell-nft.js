@@ -56,6 +56,7 @@ export default function Home() {
                 price: price,
             },
         };
+        console.log("running list-------");
 
         await runContractFunction({
             params: listOptions,
@@ -65,6 +66,7 @@ export default function Home() {
     }
 
     async function handleListSuccess() {
+        console.log("Handle success notification p-----");
         dispatch({
             type: "success",
             message: "NFT listing!",
