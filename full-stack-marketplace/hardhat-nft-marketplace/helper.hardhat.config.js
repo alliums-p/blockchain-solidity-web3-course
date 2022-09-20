@@ -2,10 +2,13 @@ const { ethers } = require("hardhat")
 
 const networkConfig = {
     4: {
-        name: "rinkeby"
+        name: "rinkeby",
+    },
+    5: {
+        name: "goerli",
     },
     31337: {
-        name: "hardhat"
+        name: "hardhat",
     },
 }
 
