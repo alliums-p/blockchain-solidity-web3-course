@@ -11,6 +11,8 @@
     "moralis:cloud": "moralis-admin-cli watch-cloud-folder --moralisApiKey MptTBs84oR48Jez --moralisApiSecret grTMWRdaZRLeEV5 --moralisSubdomain irl9zc6vclbn.usemoralis.com --autoSave 1 --moralisCloudfolder ./cloudFunctions"
   },
   "dependencies": {
+    "@apollo/client": "^3.6.9",
+    "graphql": "^16.6.0",
     "moralis": "^1.5.11",
     "moralis-v1": "^1.11.0",
     "next": "12.2.5",
